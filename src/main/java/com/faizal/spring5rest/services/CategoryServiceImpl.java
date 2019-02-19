@@ -3,10 +3,12 @@ package com.faizal.spring5rest.services;
 import com.faizal.spring5rest.api.v1.mapper.CategoryMapper;
 import com.faizal.spring5rest.api.v1.model.CategoryDTO;
 import com.faizal.spring5rest.repositories.CategoryRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class CategoryServiceImpl implements CategoryService {
 
     private CategoryRepository categoryRepository;
