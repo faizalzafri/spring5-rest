@@ -25,4 +25,18 @@ public class CategoryMapperTest {
         assertEquals(String.valueOf(NAME), categoryDTO.getName());
 
     }
+
+    @Test
+    public void categoryDTOToCategory() {
+
+        CategoryDTO categoryDTO = new CategoryDTO();
+        categoryDTO.setName(NAME);
+        categoryDTO.setId(ID);
+
+        Category category = categoryMapper.categoryDTOToCategory(categoryDTO);
+
+        assertEquals(Long.valueOf(ID), category.getId());
+        assertEquals(String.valueOf(NAME), category.getName());
+
+    }
 }
