@@ -148,5 +148,38 @@ public class CustomerControllerTest {
         //assertEquals(new ObjectMapper().writeValueAsString(incomingDto), response);
     }
 
+    @Test
+    public void patchCustomer() throws Exception {
+
+        //given
+        CustomerDTO incomingDto = new CustomerDTO();
+        incomingDto.setFirstname(NAME);
+        incomingDto.setLastname(NAME);
+
+        CustomerDTO returnDto = new CustomerDTO();
+        returnDto.setFirstname(NAME);
+        returnDto.setLastname(NAME);
+        returnDto.setUrl("/api/v1/customers/1");
+
+        //when
+        when(customerService.patchCustomer(anyLong(), any(CustomerDTO.class))).thenReturn(returnDto);
+
+        //then
+        mockMvc.perform(patch("/api/v1/customers/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(incomingDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.firstname", equalTo(NAME)))
+                .andExpect(jsonPath("$.lastname", equalTo(NAME)))
+                .andExpect(jsonPath("$.url", equalTo("/api/v1/customers/1")));
+
+//        String response = mockMvc.perform(post("/api/v1/customers")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .content(new ObjectMapper().writeValueAsString(incomingDto)))
+//                .andReturn().getResponse().getContentAsString();
+//        System.out.println("response" + response);
+        // this assert statement will fail as url is null in incoming dto
+        //assertEquals(new ObjectMapper().writeValueAsString(incomingDto), response);
+    }
 
 }
