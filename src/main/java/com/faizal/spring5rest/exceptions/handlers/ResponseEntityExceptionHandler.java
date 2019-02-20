@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
-public class ResponseEntityExceptionHandler {
+public class ResponseEntityExceptionHandler extends org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler {
 
     @ExceptionHandler({NotFoundException.class})
     public ResponseEntity<Object> handleNotFoundException() {
