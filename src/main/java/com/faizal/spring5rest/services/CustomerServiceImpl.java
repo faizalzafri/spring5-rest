@@ -2,6 +2,7 @@ package com.faizal.spring5rest.services;
 
 import com.faizal.spring5rest.api.v1.mapper.CustomerMapper;
 import com.faizal.spring5rest.api.v1.model.CustomerDTO;
+import com.faizal.spring5rest.domain.Customer;
 import com.faizal.spring5rest.repositories.CustomerRepository;
 import org.springframework.stereotype.Service;
 
@@ -42,5 +43,18 @@ public class CustomerServiceImpl implements CustomerService {
                     return customerDTO;
                 })
                 .orElseThrow(RuntimeException::new);
+    }
+
+    @Override
+    public CustomerDTO createNewCustomer(CustomerDTO customerDTO) {
+
+        Customer customer = customerMapper.customerDTOToCustomer(customerDTO);
+
+        Customer savedCustomer1 = customerRepository.save(customer);
+
+        CustomerDTO returnDto = customerMapper.customerToCustomerDTO(savedCustomer1);
+        returnDto.setUrl("/api/v1/customers/" + savedCustomer1.getId());
+
+        return returnDto;
     }
 }

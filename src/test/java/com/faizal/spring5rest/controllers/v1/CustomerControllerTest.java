@@ -2,6 +2,7 @@ package com.faizal.spring5rest.controllers.v1;
 
 import com.faizal.spring5rest.api.v1.model.CustomerDTO;
 import com.faizal.spring5rest.services.CustomerService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -19,6 +20,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -58,7 +60,7 @@ public class CustomerControllerTest {
         when(customerService.getAllCustomers()).thenReturn(customerDTOList);
 
         //then
-        mockMvc.perform(get("/api/v1/customers/")
+        mockMvc.perform(get("/api/v1/customers")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.customers", hasSize(2)));
@@ -78,5 +80,38 @@ public class CustomerControllerTest {
         mockMvc.perform(get("/api/v1/customers/1").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.firstname", equalTo(NAME)));
+    }
+
+    @Test
+    public void testCreateNewCustomer() throws Exception {
+
+        //given
+        CustomerDTO incomingDto = new CustomerDTO();
+        incomingDto.setFirstname(NAME);
+        incomingDto.setLastname(NAME);
+
+        CustomerDTO returnDto = new CustomerDTO();
+        returnDto.setFirstname(NAME);
+        returnDto.setLastname(NAME);
+        returnDto.setUrl("/api/v1/customers/1");
+
+        //when
+        when(customerService.createNewCustomer(incomingDto)).thenReturn(returnDto);
+
+        //then
+        mockMvc.perform(post("/api/v1/customers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(incomingDto)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.firstname", equalTo(NAME)))
+                .andExpect(jsonPath("$.url", equalTo("/api/v1/customers/1")));
+
+        String response = mockMvc.perform(post("/api/v1/customers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(incomingDto)))
+                .andReturn().getResponse().getContentAsString();
+
+        // this assert statement will fail as url is null in incoming dto
+        //assertEquals(new ObjectMapper().writeValueAsString(incomingDto), response);
     }
 }
