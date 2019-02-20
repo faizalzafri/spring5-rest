@@ -17,10 +17,10 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -83,6 +83,39 @@ public class CustomerControllerTest {
     }
 
     @Test
+    public void testUpdateCustomer() throws Exception {
+
+        //given
+        CustomerDTO incomingDto = new CustomerDTO();
+        incomingDto.setFirstname(NAME);
+        incomingDto.setLastname(NAME);
+
+        CustomerDTO returnDto = new CustomerDTO();
+        returnDto.setFirstname(NAME);
+        returnDto.setLastname(NAME);
+        returnDto.setUrl("/api/v1/customers/1");
+
+        //when
+        when(customerService.updateCustomer(anyLong(), any(CustomerDTO.class))).thenReturn(returnDto);
+
+        //then
+        mockMvc.perform(put("/api/v1/customers/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(incomingDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.firstname", equalTo(NAME)))
+                .andExpect(jsonPath("$.url", equalTo("/api/v1/customers/1")));
+
+//        String response = mockMvc.perform(post("/api/v1/customers")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .content(new ObjectMapper().writeValueAsString(incomingDto)))
+//                .andReturn().getResponse().getContentAsString();
+//        System.out.println("response" + response);
+        // this assert statement will fail as url is null in incoming dto
+        //assertEquals(new ObjectMapper().writeValueAsString(incomingDto), response);
+    }
+
+    @Test
     public void testCreateNewCustomer() throws Exception {
 
         //given
@@ -106,12 +139,14 @@ public class CustomerControllerTest {
                 .andExpect(jsonPath("$.firstname", equalTo(NAME)))
                 .andExpect(jsonPath("$.url", equalTo("/api/v1/customers/1")));
 
-        String response = mockMvc.perform(post("/api/v1/customers")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(new ObjectMapper().writeValueAsString(incomingDto)))
-                .andReturn().getResponse().getContentAsString();
-
+//        String response = mockMvc.perform(post("/api/v1/customers")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .content(new ObjectMapper().writeValueAsString(incomingDto)))
+//                .andReturn().getResponse().getContentAsString();
+//        System.out.println("response" + response);
         // this assert statement will fail as url is null in incoming dto
         //assertEquals(new ObjectMapper().writeValueAsString(incomingDto), response);
     }
+
+
 }
