@@ -1,6 +1,8 @@
 package com.faizal.spring5rest.controllers.v1;
 
 import com.faizal.spring5rest.api.v1.model.CategoryDTO;
+import com.faizal.spring5rest.exceptions.NotFoundException;
+import com.faizal.spring5rest.exceptions.handlers.ResponseEntityExceptionHandler;
 import com.faizal.spring5rest.services.CategoryService;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +40,9 @@ public class CategoryControllerTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        mockMvc = MockMvcBuilders.standaloneSetup(categoryController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(categoryController)
+                .setControllerAdvice(ResponseEntityExceptionHandler.class)
+                .build();
     }
 
     @Test
@@ -79,5 +83,14 @@ public class CategoryControllerTest {
         mockMvc.perform(get("/api/v1/categories/" + NAME).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name", equalTo(NAME)));
+    }
+
+    @Test
+    public void testGetCategoryByNameNotFound() throws Exception {
+
+        when(categoryService.getCategoryByName(anyString())).thenThrow(NotFoundException.class);
+
+        mockMvc.perform(get("/api/v1/categories/" + NAME).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 }

@@ -1,6 +1,8 @@
 package com.faizal.spring5rest.controllers.v1;
 
 import com.faizal.spring5rest.api.v1.model.CustomerDTO;
+import com.faizal.spring5rest.exceptions.NotFoundException;
+import com.faizal.spring5rest.exceptions.handlers.ResponseEntityExceptionHandler;
 import com.faizal.spring5rest.services.CustomerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
@@ -40,7 +42,9 @@ public class CustomerControllerTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        mockMvc = MockMvcBuilders.standaloneSetup(customerController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(customerController)
+                .setControllerAdvice(ResponseEntityExceptionHandler.class)
+                .build();
     }
 
     @Test
@@ -68,7 +72,7 @@ public class CustomerControllerTest {
     }
 
     @Test
-    public void testGetCustomerByName() throws Exception {
+    public void testGetCustomerById() throws Exception {
         //given
         CustomerDTO customerDTO = new CustomerDTO();
         customerDTO.setFirstname(NAME);
@@ -189,5 +193,14 @@ public class CustomerControllerTest {
                 .andExpect(status().isOk());
 
         verify(customerService, times(1)).deleteCustomerById(anyLong());
+    }
+
+    @Test
+    public void testGetCustomerByIdNotFound() throws Exception {
+        when(customerService.getCustomerById(anyLong())).thenThrow(NotFoundException.class);
+
+        mockMvc.perform(get("/api/v1/customers/1").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+
     }
 }
