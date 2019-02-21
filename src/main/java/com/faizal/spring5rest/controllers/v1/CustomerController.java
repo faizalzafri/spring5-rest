@@ -3,12 +3,17 @@ package com.faizal.spring5rest.controllers.v1;
 import com.faizal.spring5rest.api.v1.model.CustomerDTO;
 import com.faizal.spring5rest.api.v1.model.CustomerListDTO;
 import com.faizal.spring5rest.services.CustomerService;
+import com.faizal.spring5rest.validator.CustomerDTOValidator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/customers")
 public class CustomerController {
+
+    @Autowired
+    private CustomerDTOValidator customerDTOValidator;
 
     private CustomerService customerService;
 
@@ -38,6 +43,9 @@ public class CustomerController {
     @PutMapping({"/{id}"})
     @ResponseStatus(HttpStatus.OK)
     public CustomerDTO updateCustomer(@PathVariable Long id, @RequestBody CustomerDTO customerDTO) {
+
+        customerDTOValidator.validate(customerDTO);
+
         return customerService.updateCustomer(id, customerDTO);
     }
 
